@@ -23,9 +23,9 @@ import json
 # Base set of hyper-parameters are specified in this dictionary
 base_params = {
     # Alpha rank hyper-parameters
-    "alpha": [0.1],
+    "alpha": [0.001],
     "alpha_mutation": [50],
-    "inf_alpha": [True],
+    "inf_alpha": [False],
     "inf_alpha_eps": [0.000001],
     "alpha_rank_cache": [True],
     "alpha_rank_sparse": [False],
@@ -45,16 +45,16 @@ base_params = {
     "mc_samples": [200],
 
     "env_seed": [10 + i for i in range(1)],
-    "env": ["Gaussian_4_1pop"],#.format(n, h) for n in [8] for h in [10]],
-    "min_payoff": [0],
-    "max_payoff": [1],
+    "env": ["Gaussian_4_1pop"],  # .format(n, h) for n in [8] for h in [10]],
+    "min_payoff": [-1.2],
+    "max_payoff": [1.2],
 
-    "repeats": [1],#[1+i for i in range(3)], # Number of repeats of the same experimental config
-    "label": ["alphaRankExpsLabel"], # Label to assign these experiments
- 
-    "t_max": [10000], # Maximum timesteps to run for
+    "repeats": [1,2,3],  # [1+i for i in range(3)], # Number of repeats of the same experimental config
+    "label": ["alphaRankExpsLabel"],  # Label to assign these experiments
 
-    "graphing_samples": [2000], # Number of alpha-ranks to save 100 times during training for graphing
+    "t_max": [100*15*15],  # Maximum timesteps to run for
+
+    "graphing_samples": [2000],  # Number of alpha-ranks to save 100 times during training for graphing
 
 }
 
@@ -63,10 +63,10 @@ base_params = {
 
 # # Running on 4x4 Gaussian Games
 env_params = {
-     "env_seed": [10 + i for i in range(1)],
-     "env": ["Gaussian_4_1pop"],
-     "min_payoff": [-1],
-     "max_payoff": [2],
+    "env_seed": [10 + i for i in range(1)],
+    "env": ["Gaussian_4_1pop"],
+    "min_payoff": [-1.2],
+    "max_payoff": [1.2],
 }
 
 # # Running on 2 Good, 2 Bad
@@ -85,7 +85,6 @@ base_params = {**env_params, **base_params}
 
 # Parameters for the algorithms that are going to be run
 exp_params = [
-
 
     # \alphaIG
     {
@@ -115,9 +114,9 @@ exp_params = [
 
 ]
 
-num_in_parallel = 100 # Number of runs to launch in parallel
-folder = "alphaRankRuns" # Folder to save the experiments
-SAVING = True # If you are saving the results or not
+num_in_parallel = 1  # Number of runs to launch in parallel
+folder = "alphaRankRuns"  # Folder to save the experiments
+SAVING = True  # If you are saving the results or not
 
 exps = []
 if exp_params == []:
@@ -131,39 +130,31 @@ direc = "{}/{}".format(os.getcwd(), folder)
 if SAVING and not os.path.exists(direc):
     os.makedirs(direc, exist_ok=True)
 
-if SAVING:
-    with open("{}/experiments.json".format(direc), "a") as f:
-        f.write("----- EXPERIMENTS -----")
-    for exp_dict in exp_params:
-        params = {**base_params, **exp_dict}
-        with open("{}/epxperiments.json".format(direc), "a") as f:
-            f.write("\n+++\n")
-            json.dump(params, f)
 
-date_str = str(datetime.date.today())
+
+date_str = "alphaIGga15"#str(datetime.date.today())
 
 start_time = time.time()
 
 env_dict = {}
-for i in range(5,6,1):
-    env_dict["Gaussian_4_1pop"] = partial(GaussianOnePopGames, actions=4)#partial(BadAgentTies, actions=100, hardness=10)#partial(GaussianOnePopGames, actions=4)
-    #env_dict["{}_Agent_Ties".format(i)] = partial(BadAgentTies, actions=i, hardness=10)
+for i in range(5, 6, 1):
+    env_dict["Gaussian_4_1pop"] = partial(GaussianOnePopGames, actions=15)
+    # env_dict["{}_Agent_Ties".format(i)] = partial(BadAgentTies, actions=i, hardness=10)
 
 
 def run_exp(d):
     i, exp = d
     exp_start_time = time.time()
-    print("Starting exp {}".format(i+1))
-
+    print("Starting exp {}".format(i + 1))
 
     # Alpha rank function
-    alpha_rank_partial = partial(alpha_rank, 
-                                    alpha=exp["alpha"], 
-                                    mutation=exp["alpha_mutation"], 
-                                    use_inf_alpha=exp["inf_alpha"], 
-                                    inf_alpha_eps=exp["inf_alpha_eps"],
-                                    use_sparse=exp["alpha_rank_sparse"],
-                                    use_cache=exp["alpha_rank_cache"])
+    alpha_rank_partial = partial(alpha_rank,
+                                 alpha=exp["alpha"],
+                                 mutation=exp["alpha_mutation"],
+                                 use_inf_alpha=exp["inf_alpha"],
+                                 inf_alpha_eps=exp["inf_alpha_eps"],
+                                 use_sparse=exp["alpha_rank_sparse"],
+                                 use_cache=exp["alpha_rank_cache"])
 
     # Env
     payoffs = env_dict[exp["env"]](seed=exp["env_seed"])
@@ -171,39 +162,41 @@ def run_exp(d):
 
     # Distribution over payoffs
     if exp["payoff_distrib"] == "indep_normal":
-        payoff_distrib = IndependentNormal(num_pops, num_strats, num_players, 
-                                            starting_mu=exp["starting_mu"], 
-                                            starting_var=exp["starting_var"], 
-                                            noise_var=exp["noise_var"],
-                                            hallucination_samples=exp["hallucinate_samples"])
+        payoff_distrib = IndependentNormal(num_pops, num_strats, num_players,
+                                           starting_mu=exp["starting_mu"],
+                                           starting_var=exp["starting_var"],
+                                           noise_var=exp["noise_var"],
+                                           hallucination_samples=exp["hallucinate_samples"])
     elif exp["payoff_distrib"] == "normal_kernel":
         payoff_distrib = NormalKernel(num_pops, num_strats, num_players,
-                                            starting_mu=exp["starting_mu"], 
-                                            starting_var=exp["starting_var"], 
-                                            noise_var=exp["noise_var"],
-                                            hallucination_samples=exp["hallucinate_samples"])
+                                      starting_mu=exp["starting_mu"],
+                                      starting_var=exp["starting_var"],
+                                      noise_var=exp["noise_var"],
+                                      hallucination_samples=exp["hallucinate_samples"])
 
-    if exp["sampler"] == "bayesian": # \alphaIG and \alphaWass
-        sampler = BayesianBandit(num_pops, num_strats, num_players, 
-                                    payoff_distrib=payoff_distrib, 
-                                    alpha_rank_func=alpha_rank_partial, 
-                                    mc_samples=exp["mc_samples"], 
-                                    acquisition=exp["acquisition"], 
-                                    expected_hallucinate=exp["expected_hallucinate"],
-                                    expected_samples=exp["expected_hallucinate_samples"],
-                                    use_parallel=True,
-                                    repeat_sampling=exp["repeat_sampling"])
-    elif exp["sampler"] == "payoff_bandit": # Payoff
-        sampler = PayoffBayesianBandit(num_pops, num_strats, num_players, payoff_distrib=payoff_distrib, alpha_rank_func=alpha_rank_partial)
-    elif exp["sampler"] == "freq2": # ResponseGraphUCB
-        sampler = FreqBandit(num_pops, num_strats, num_players, max_payoff=exp["max_payoff"], min_payoff=exp["min_payoff"], delta=exp["delta"], alpha_rank_func=alpha_rank_partial)
-    elif exp["sampler"] == "random": # Random
+    if exp["sampler"] == "bayesian":  # \alphaIG and \alphaWass
+        sampler = BayesianBandit(num_pops, num_strats, num_players,
+                                 payoff_distrib=payoff_distrib,
+                                 alpha_rank_func=alpha_rank_partial,
+                                 mc_samples=exp["mc_samples"],
+                                 acquisition=exp["acquisition"],
+                                 expected_hallucinate=exp["expected_hallucinate"],
+                                 expected_samples=exp["expected_hallucinate_samples"],
+                                 use_parallel=True,
+                                 repeat_sampling=exp["repeat_sampling"])
+    elif exp["sampler"] == "payoff_bandit":  # Payoff
+        sampler = PayoffBayesianBandit(num_pops, num_strats, num_players, payoff_distrib=payoff_distrib,
+                                       alpha_rank_func=alpha_rank_partial)
+    elif exp["sampler"] == "freq2":  # ResponseGraphUCB
+        sampler = FreqBandit(num_pops, num_strats, num_players, max_payoff=exp["max_payoff"],
+                             min_payoff=exp["min_payoff"], delta=exp["delta"], alpha_rank_func=alpha_rank_partial)
+    elif exp["sampler"] == "random":  # Random
         sampler = RandomSampler(num_pops, num_strats, num_players, alpha_rank_func=alpha_rank_partial)
-    
+
     logging_info = run_sampling(payoffs, sampler, max_iters=exp["t_max"], graph_samples=exp["graphing_samples"])
 
     exp_end_time = time.time()
-    print("Finished exp {} in {:,} seconds".format(i+1, exp_end_time - exp_start_time))
+    print("Finished exp {} in {:,} seconds".format(i + 1, exp_end_time - exp_start_time))
 
     logging_info["exp_info"] = exp
     logging_info["env_info"] = {
@@ -214,6 +207,7 @@ def run_exp(d):
     }
 
     return logging_info
+
 
 print("--- Starting {} Experiments ---".format(len(exps)))
 if not SAVING:
@@ -228,7 +222,7 @@ with Pool(num_in_parallel) as pool:
         if SAVING:
             print("---SAVING DATA---")
             # Save the data in a dictionary
-            print("Saving data for exp {}".format(ix+1))
+            print("Saving data for exp {}".format(ix + 1))
             # Save to a new file
             name_num = ix
             name = "{}_{}".format(date_str, name_num)
@@ -239,7 +233,7 @@ with Pool(num_in_parallel) as pool:
                 pickle.dump(exp_data, f)
             sleep(1)
         else:
-            print("++++ NOT SAVING DATA FOR EXP {}++++".format(ix+1))
+            print("++++ NOT SAVING DATA FOR EXP {}++++".format(ix + 1))
         ix += 1
 
 end_time = time.time()

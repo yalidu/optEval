@@ -1,9 +1,0 @@
-numpy
-scipy
-matplotlib
-cvxpy
-seaborn
-POT
-jupyter
-jupyterlab
-ndd

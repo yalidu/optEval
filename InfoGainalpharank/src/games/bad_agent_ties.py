@@ -22,17 +22,19 @@ class BadAgentTies:
                 [ -1, -p,  0],
             ]])
             self.matrix = (self.matrix + 1) / 2
-        self.matrix = np.load('/home/yali/yanxue/bernoulli10.npy')
+        self.matrix = np.load('/home/yali/yanxue/bernoullir2.npy')
         self.matrix = np.reshape(self.matrix, (1, actions, actions))
         self.Mmax = np.max(self.matrix)
         self.Mmin = np.min(self.matrix)
 
         self.matrix = (self.matrix - self.Mmin) / (self.Mmax - self.Mmin)
         #print(self.matrix)
+        self.matrix = np.load('/home/yali/yanxue/bernoullir2.npy')
+        self.matrix = np.reshape(self.matrix, (1, actions, actions))
         self.logger.debug("\n"+str(np.around(self.matrix, 2)))
 
     def get_entry_sample(self, entry):
-        player1_win = np.random.binomial(100, self.matrix[0][tuple(entry)])
+        player1_win = np.random.binomial(10, self.matrix[0][tuple(entry)])
         return np.array([player1_win])
 
     def true_payoffs(self):

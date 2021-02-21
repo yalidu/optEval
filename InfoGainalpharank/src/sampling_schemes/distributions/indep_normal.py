@@ -40,7 +40,7 @@ class IndependentNormal:
 
     def update_entry(self, strats, payoffs):
         # Update means and sigmas
-        k=100
+        k=60
         for player, payoff in enumerate(payoffs):
             # Update the payoff matrix for player p
             self.counts[player][tuple(strats)] += k
