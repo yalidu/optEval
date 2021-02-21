@@ -1,0 +1,33 @@
+OptSpace : A Matrix Completion Algorithm
+
+COPYRIGHT (C) 2009 Raghunandan H. Keshavan, Andrea Montanari, Sewoong Oh
+29th March 2010
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+Files included in this package :
+    OptSpace.c	  : Source file for the reconstruction program	
+	OptSpace.h    : Include file for the reconstruction program
+	
+	svdlib.c, svdlib.h, svdutil.c, svdutil.h, las2.c 
+			  : Files from SVDLIBC (modified to add the function svdLAS2B) 
+	
+	matops.c  : Matrix Operations
+	rand.c    : Random Number Generators
+	Makefile  : Makefile for libOptSpace.a
+
+	testing/testing.c : Sample code to test the OptSpace function
+	testing/Makefile  : Makefile for testing.c
+
+
+Compiling :
+Run make in the current direcotory to compile the library. To test the library (libOptSpace.a) run make in the testing/ directory and run test. To test the library in MATLAB, run make in the testing/ directory and run testing.m in MATLAB.
+
+
+Please refer to comments in (OptSpace.h) for usage.Also, refer to "Matrix Completion from a Few Entries" (http://arxiv.org/pdf/0901.3150) for details about the algorithm.
