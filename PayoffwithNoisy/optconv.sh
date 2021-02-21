@@ -1,0 +1,43 @@
+python mainconv.py 10
+python mainconv.py 20
+python mainconv.py 30
+python mainconv.py 40
+python mainconv.py 50
+python mainconv.py 60
+python mainconv.py 70
+python mainconv.py 80
+python mainconv.py 90
+python mainconv.py 100
+python mainconv.py 110
+python mainconv.py 120
+python mainconv.py 130
+python mainconv.py 140
+python mainconv.py 150
+python mainconv.py 160
+python mainconv.py 170
+python mainconv.py 180
+python mainconv.py 190
+python mainconv.py 200
+python 20noisyRGUCB_process.py
+python optconv.py 10
+python optconv.py 20
+python optconv.py 30
+python optconv.py 40
+python optconv.py 50
+python optconv.py 60
+python optconv.py 70
+python optconv.py 80
+python optconv.py 90
+python optconv.py 100
+python optconv.py 110
+python optconv.py 120
+python optconv.py 130
+python optconv.py 140
+python optconv.py 150
+python optconv.py 160
+python optconv.py 170
+python optconv.py 180
+python optconv.py 190
+python optconv.py 200
+
+python picture_20conv_noisy.py
