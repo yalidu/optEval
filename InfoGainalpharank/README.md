@@ -6,7 +6,7 @@ We compare our optEval with alpha-IG proposed in “Estimating alpha-Rank by Max
 
 ## alpha-IG on Gaussian game 
 
-To do experiments on Gaussian(15*15), please run the following instruction in  dictionary src/. 
+To do experiments on Gaussian(15*15), please run the following instruction in file src/. 
 
 ```
 python run_experiments.py 
